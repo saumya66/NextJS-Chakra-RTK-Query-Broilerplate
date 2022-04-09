@@ -1,0 +1,30 @@
+{
+  "name": "nextjs-template",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@chakra-ui/react": "^1.8.8",
+    "@emotion/react": "^11",
+    "@emotion/styled": "^11",
+    "@reduxjs/toolkit": "^1.8.1",
+    "axios": "^0.26.1",
+    "formik": "^2.2.9",
+    "framer-motion": "^6",
+    "next": "12.1.4",
+    "nprogress": "^0.2.0",
+    "react": "18.0.0",
+    "react-dom": "18.0.0",
+    "react-redux": "^7.2.8",
+    "yup": "^0.32.11"
+  },
+  "devDependencies": {
+    "eslint": "8.12.0",
+    "eslint-config-next": "12.1.4"
+  }
+}
