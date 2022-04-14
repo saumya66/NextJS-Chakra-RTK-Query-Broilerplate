@@ -5,6 +5,8 @@ const config = {
   initialColorMode: 'light',
   useSystemColorMode: false,
 }
+
+//custom styling
 const styles = {
     global: props => ({
       body: {
@@ -13,6 +15,7 @@ const styles = {
       },
     }),
   };
+  
 const theme = extendTheme({ config ,styles})
 
 export default theme

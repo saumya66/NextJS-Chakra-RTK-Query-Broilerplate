@@ -8,17 +8,7 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
     Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
 }
-/* .chakra-ui-light{
-  color: "red"!important; 
-  background-color: #6725ff;
-   height: 100%;
-	width: 100%;
-}
-.chakra-ui-dark{
-  background-color: #6215ff;
-  height: 100%;
-	width: 100%;
-} */
+
 /*To import and use a custom font*/
 /* @font-face {
   font-family: "Coves";    

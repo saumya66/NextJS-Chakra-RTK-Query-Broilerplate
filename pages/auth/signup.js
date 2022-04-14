@@ -4,10 +4,8 @@ import styles from "../../styles/Auth.module.css"
 
 const SignUp = ()=>{
     return(
-        // <Box w="100vw" h="100vh">
-        //    {/* <Tex */}
-        // </Box>
-        <div className={styles.container}>
+
+        <div>
             <h1>dfdf</h1>
         </div>
     )
