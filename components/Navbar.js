@@ -27,7 +27,7 @@ const Navbar = ()=>{
     };
     return(
     <>
-    <Flex bg="transparent" h="60px" w="100%" pos={"fixed"} display={["none","none","flex","flex"]}>
+    <Flex zIndex={20} bg="transparent" h="60px" w="100%" pos={"fixed"} display={["none","none","flex","flex"]}>
         <Box p='4'>
             <Link href="/">
             <Text>LearnVerse</Text>

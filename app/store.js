@@ -1,14 +1,14 @@
 import { configureStore} from '@reduxjs/toolkit'
+import { authAPI } from '../pages/auth/authApi'
 import exampleReducer from './exampleReduxSlice'
-import {exampleAPI} from './exampleRTKQuery'
 
 const store = configureStore({
 		reducer: {
             example : exampleReducer,
-            [exampleAPI.reducerPath] : exampleAPI.reducer
+            [authAPI.reducerPath] : authAPI.reducer
 		},
 		middleware: (getDefaultMiddleware) =>
-			getDefaultMiddleware().concat(exampleAPI.middleware)
+			getDefaultMiddleware().concat(authAPI.middleware)
 })
 
 
