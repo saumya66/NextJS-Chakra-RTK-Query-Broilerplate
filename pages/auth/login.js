@@ -21,7 +21,7 @@ const Login = ()=>{
             await login(values).unwrap()
             // console.log(userInfo)
             notify("success","Logged In");
-            router
+            router.push("/")
         }
         catch(err){
             console.log(err?.data?.message)
@@ -44,6 +44,7 @@ const Login = ()=>{
             <form>
                 <TextInput onChange={handleChange('email')} name='email' hand value={values.email} label='Email' placeholder="Enter email" error={errors.email}/>
                 <TextInput onBlur={handleBlur('password')} onChange={handleChange('password')} name='password' value={values.password} label='Password' placeholder="Enter password" error={errors.password}/>
+                {loginError && <Text fontSize="12px" color="bad.primary" fontWeight="medium">{loginError}</Text>}
                 <Button 
                     isLoading={isSubmitting}
                     my={8}

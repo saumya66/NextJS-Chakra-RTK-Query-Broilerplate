@@ -21,7 +21,7 @@ const SignUp = ()=>{
             await register(values).unwrap()
             // console.log(userInfo)
             notify("success","Welcome");
-            router
+            router.push("/")
         }
         catch(err){
             console.log(err?.data?.message)
