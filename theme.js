@@ -10,13 +10,14 @@ const config = {
 const styles = {
     global: props => ({
       body: {
-        color: mode('gray.800', 'whiteAlpha.900')(props),
-        bg: mode('gray.200', '#141214')(props),
+        color: mode('gray.800', 'gray.800')(props),
+        bg: mode('gray.200', '#1F1F23')(props),
       },
     }),
     
   };
-   
+
+//Example props -> color = "brand.100"   
 const theme = extendTheme({ config ,styles, 
   colors:{
     brand :{
@@ -39,3 +40,4 @@ const theme = extendTheme({ config ,styles,
 }})
 
 export default theme
+

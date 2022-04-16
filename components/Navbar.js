@@ -1,6 +1,6 @@
 import { Box, Button, Center, Flex, Input, Spacer, Text, useColorMode, useDisclosure, VStack } from '@chakra-ui/react';
 import Link from 'next/link';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {BsFillMoonStarsFill,BsFillSunFill} from "react-icons/bs"
 import { HiMenu } from "react-icons/hi";
 import {
@@ -12,11 +12,30 @@ import {
     DrawerContent,
     DrawerCloseButton,
   } from '@chakra-ui/react'
+import {
+    Menu,
+    MenuButton,
+    MenuList,
+    MenuItem,
+    MenuItemOption,
+    MenuGroup,
+    MenuOptionGroup,
+    MenuDivider,
+  } from '@chakra-ui/react'
 import { useRouter } from 'next/router';
+import Cookies from 'js-cookie';
+import { FaRegUserCircle } from "react-icons/fa";
+import { useGetAccessTokenMutation, useLogoutUserMutation } from '../pages/auth/authApi';
+import store from '../app/store';
+import {logout, setUser} from "../pages/auth/authSlice"
+import { useSelector } from 'react-redux';
 
 const Navbar = ()=>{
+    const [logoutUser] = useLogoutUserMutation()
+    const [getNewAccessToken] = useGetAccessTokenMutation()
     const { colorMode, toggleColorMode } = useColorMode()
     const { isOpen, onOpen, onClose } = useDisclosure()
+    const user = useSelector(state => state.auth)
     const router = useRouter()
     const btnRef = React.useRef()
 
@@ -25,12 +44,52 @@ const Navbar = ()=>{
         if(isOpen)onClose();
         router.push(path)
     };
+
+    const handleLogout = async()=>{
+        try{
+            const refreshToken = Cookies.get("refreshToken")
+            await logoutUser(refreshToken).unwrap()
+            store.dispatch(logout())
+            router.push("/")
+        }
+        catch(error){
+            console.log(error)
+        }
+    }
+    const handleIsLoggedIn = async() => {                  
+        if(typeof window !== "undefined"){
+            const refreshToken = Cookies.get("refreshToken")
+            const accessToken = Cookies.get("accessToken")
+            if(refreshToken && accessToken){
+                store.dispatch(setUser({isLoggedIn:true}))
+            }
+            if(!refreshToken){
+                store.dispatch(logout())
+                console.log(router.asPath!='/auth/signup')
+               if(router.asPath != '/auth/signup' && router.asPath != '/auth/login')router.push("/",undefined, { shallow: true })
+                return
+            }
+            if(refreshToken && !accessToken){
+               const accessToken = await getNewAccessToken(refreshToken).unwrap()
+               const date = new Date();
+               let accessTokenExpireDate=  new Date(date.getTime() +(60*1000));
+               Cookies.set("accessToken",accessToken?.accessToken, {expires: accessTokenExpireDate})
+               store.dispatch(setUser({isLoggedIn:true}))
+            }
+            console.log(router.asPath != '/auth/signup')
+            if(router.asPath == '/auth/signup' || router.asPath == '/auth/login')router.push("/",undefined, { shallow: true })
+        }
+    }
+    useEffect(()=>{
+        handleIsLoggedIn()
+
+    },[])
     return(
     <>
-    <Flex zIndex={20} bg="transparent" h="60px" w="100%" pos={"fixed"} display={["none","none","flex","flex"]}>
-        <Box p='4'>
+    <Flex zIndex={20} bg="transparent" h="60px" w="100%" pos={"fixed"} display={["none","none","flex","flex"]} px="4" py="2" alignItems="center">
+        <Box >
             <Link href="/">
-            <Text>LearnVerse</Text>
+            <Text>Project Name</Text>
             </Link>
         </Box>
         <Spacer/>
@@ -39,16 +98,27 @@ const Navbar = ()=>{
             {colorMode === 'light' ? <BsFillMoonStarsFill/> : <BsFillSunFill/>}
             </Button>
         </Center>
-        <Box p='4'>
-            <Link href="/auth/signup">
-            <Text>Sign Up</Text>
-            </Link>
-        </Box>
-        <Box p='4'>
-            <Link href="/auth/login">
-            <Text>SignIn</Text>
-            </Link>
-        </Box>
+        {user.isLoggedIn ? <Menu>
+            <MenuButton as={Button} color='brand.800' ml="4" leftIcon={<FaRegUserCircle/>}>
+                Profile
+            </MenuButton>
+            <MenuList>
+                <MenuItem onClick={handleLogout} >Logout</MenuItem>
+            </MenuList>
+        </Menu> :
+        <>
+            <Box ml="4">
+                <Link href="/auth/signup">
+                <Text>Sign Up</Text>
+                </Link>
+            </Box>
+            <Box ml="4">
+                <Link href="/auth/login">
+                <Text>Sign In</Text>
+                </Link>
+            </Box>
+        </>
+        }
     </Flex>
     <Flex  bg="transparent" direction="row" h="60px" w="100%" pos={"fixed"} display={["flex","flex","none","none"]}>
         <Box p='2' w="20%">
@@ -58,7 +128,7 @@ const Navbar = ()=>{
         </Box>
         <Center p='4'  w="65%" >
             <Link href="/">
-                <Text fontSize='lg'>LearnVerse</Text>
+                <Text fontSize='lg'>Project Name</Text>
             </Link>
         </Center>
     </Flex>

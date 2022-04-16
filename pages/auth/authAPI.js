@@ -1,16 +1,15 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
+import { axiosBaseQuery } from '../../app/api'
 
 export const authAPI = createApi({
+	baseQuery: axiosBaseQuery(),
 	reducerPath: 'authAPI',
-	baseQuery: fetchBaseQuery({
-		baseUrl: 'http://localhost:4000',
-	}),
 	endpoints: (builder) => ({
 		registerUser: builder.mutation({
 			query: (user) => ({
 				url: '/v1/auth/register',
 				method: 'POST',
-				body: user,
+				data: user,
 			}),
 			// transformResponse: (response) => response.data
 		}),
@@ -18,12 +17,26 @@ export const authAPI = createApi({
 			query: (user) => ({
 				url: '/v1/auth/login',
 				method: 'POST',
-				body: user,
+				data: user,
+			}),
+		}),
+		getAccessToken: builder.mutation({
+			query: (refreshToken) => ({
+				url: '/v1/auth/refresh-token',
+				method: 'POST',
+				data: {refreshToken},
+			}),
+		}),
+        logoutUser: builder.mutation({
+			query: (refreshToken) => ({
+				url: '/v1/auth/logout',
+				method: 'POST',
+				data: {refreshToken},
 			}),
 		}),
 	}),
 })
 
 export const {
-	useRegisterUserMutation,useLoginUserMutation
+	useRegisterUserMutation,useLoginUserMutation, useGetAccessTokenMutation, useLogoutUserMutation
 } = authAPI

@@ -7,11 +7,16 @@ import store from '../app/store'
 import { ChakraProvider } from '@chakra-ui/react'
 import Layout from '../app/Layout';
 import theme from '../theme';
+import { useEffect } from 'react';
+import Cookies from 'js-cookie'
 
 //Binding events. 
 Router.events.on('routeChangeStart', () => NProgress.start()); Router.events.on('routeChangeComplete', () => NProgress.done()); Router.events.on('routeChangeError', () => NProgress.done());
 
+
+
 function MyApp({ Component, pageProps }) {
+
   return (
     <ChakraProvider theme={theme}>
       <Provider store={store}>

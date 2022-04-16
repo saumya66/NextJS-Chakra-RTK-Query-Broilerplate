@@ -1,11 +1,15 @@
 import { Box, Button, Flex, Text } from '@chakra-ui/react';
 import React, { useState } from 'react';
 import TextInput from '../../components/TextInput';
-import { Field, Formik } from "formik";
+import {  Formik } from "formik";
 import { signUpSchema } from '../../app/validations';
 import { useRegisterUserMutation } from './authApi';
 import toast from "../../components/Toast";
 import { useRouter } from 'next/router';
+import Cookies from 'js-cookie'
+
+import store from '../../app/store';
+import { setUser } from './authSlice';
 
 const SignUp = ()=>{
     const router = useRouter()
@@ -16,12 +20,17 @@ const SignUp = ()=>{
     const [signUpError, setSignUpError] =  useState()
 
     const handleSignUp = async(values,actions)=>{
+        setSignUpError("")
         try{
-            console.log(values)
-            await register(values).unwrap()
-            // console.log(userInfo)
+            const userInfo = await register(values).unwrap()
+            store.dispatch(setUser({userId: userInfo?.user?._id, email :userInfo?.user?.email, isLoggedIn : true}))
+            const date = new Date();
+            let accessTokenExpireDate=  new Date(date.getTime() +(60*1000));
+            let refreshTokenExpireDate=  new Date(date.getTime() +(86400*1000));
+            Cookies.set("accessToken",userInfo?.tokens?.accessToken, {expires: accessTokenExpireDate})
+            Cookies.set("refreshToken",userInfo?.tokens?.refreshToken,{expires: refreshTokenExpireDate})
             notify("success","Welcome");
-            router.push("/")
+            router.push("/app")
         }
         catch(err){
             console.log(err?.data?.message)

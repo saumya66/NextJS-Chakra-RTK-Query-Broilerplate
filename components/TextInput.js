@@ -2,7 +2,6 @@ import React from 'react'
 import { Flex, Input, Text } from '@chakra-ui/react'
 
 const TextInput = ({placeholder='', error, label='', value, onChange})=>{
-    console.log(error)
     return(
         <Flex direction="column" h="100px">
             {label && <Text fontWeight="medium" fontSize="14px" mb={2}>{label}</Text>}

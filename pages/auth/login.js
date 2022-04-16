@@ -6,6 +6,9 @@ import { signUpSchema } from '../../app/validations';
 import { useLoginUserMutation } from './authApi';
 import toast from "../../components/Toast";
 import { useRouter } from 'next/router';
+import store from '../../app/store';
+import { setUser } from './authSlice';
+import Cookies from 'js-cookie'
 
 const Login = ()=>{
     const router = useRouter()
@@ -17,15 +20,20 @@ const Login = ()=>{
 
     const handleLogin = async(values,actions)=>{
         try{
-            console.log(values)
-            await login(values).unwrap()
-            // console.log(userInfo)
+            const userInfo = await login(values).unwrap()
+            console.log(userInfo)
+            store.dispatch(setUser({userId: userInfo?.user?._id, email :userInfo?.user?.email, isLoggedIn : true}))
+            let date = new Date();
+            let accessTokenExpireDate=  new Date(date.getTime() +(60*1000));
+            let refreshTokenExpireDate=  new Date(date.getTime() +(86400*1000));
+            Cookies.set("accessToken",userInfo?.tokens?.accessToken, {expires: accessTokenExpireDate})
+            Cookies.set("refreshToken",userInfo?.tokens?.refreshToken,{expires: refreshTokenExpireDate})
             notify("success","Logged In");
-            router.push("/")
+            router.push("/app")
         }
         catch(err){
             console.log(err?.data?.message)
-            setSignUpError("Invalid email or password.")
+            setLoginError("Invalid email or password.")
             notify("error", "Invalid Credentials !")
         }
         actions.setSubmitting(false);
