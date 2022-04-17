@@ -29,10 +29,12 @@ import { useGetAccessTokenMutation, useLogoutUserMutation } from '../pages/auth/
 import store from '../app/store';
 import {logout, setUser} from "../pages/auth/authSlice"
 import { useSelector } from 'react-redux';
+import { useGetUserMutation } from '../pages/user/userAPI';
 
 const Navbar = ()=>{
     const [logoutUser] = useLogoutUserMutation()
     const [getNewAccessToken] = useGetAccessTokenMutation()
+    const [getUser]  = useGetUserMutation()
     const { colorMode, toggleColorMode } = useColorMode()
     const { isOpen, onOpen, onClose } = useDisclosure()
     const user = useSelector(state => state.auth)
@@ -60,29 +62,21 @@ const Navbar = ()=>{
         if(typeof window !== "undefined"){
             const refreshToken = Cookies.get("refreshToken")
             const accessToken = Cookies.get("accessToken")
-            if(refreshToken && accessToken){
-                store.dispatch(setUser({isLoggedIn:true}))
-            }
             if(!refreshToken){
                 store.dispatch(logout())
-                console.log(router.asPath!='/auth/signup')
-               if(router.asPath != '/auth/signup' && router.asPath != '/auth/login')router.push("/",undefined, { shallow: true })
+                if(router.asPath != '/auth/signup' && router.asPath != '/auth/login')router.push("/",undefined, { shallow: true })
                 return
             }
-            if(refreshToken && !accessToken){
-               const accessToken = await getNewAccessToken(refreshToken).unwrap()
-               const date = new Date();
-               let accessTokenExpireDate=  new Date(date.getTime() +(60*1000));
-               Cookies.set("accessToken",accessToken?.accessToken, {expires: accessTokenExpireDate})
-               store.dispatch(setUser({isLoggedIn:true}))
+            if(refreshToken){   // - sets a new acc token if expired in interceptor - used to get the user's info
+               const user = await getUser().unwrap()   
+               console.log(user)
+               store.dispatch(setUser({isLoggedIn:true, userId: user?.user?.id, email: user?.user?.email }))
             }
-            console.log(router.asPath != '/auth/signup')
             if(router.asPath == '/auth/signup' || router.asPath == '/auth/login')router.push("/",undefined, { shallow: true })
         }
     }
     useEffect(()=>{
-        handleIsLoggedIn()
-
+        typeof window !== 'undefined' && handleIsLoggedIn()
     },[])
     return(
     <>
@@ -104,6 +98,7 @@ const Navbar = ()=>{
             </MenuButton>
             <MenuList>
                 <MenuItem onClick={handleLogout} >Logout</MenuItem>
+                <MenuItem onClick={()=>router.push("/user")} >Profile</MenuItem>
             </MenuList>
         </Menu> :
         <>

@@ -41,6 +41,7 @@ server.interceptors.response.use(
     const originalConfig = error.config;
     if (error.response) {
       if (error.response?.status === 401 && !originalConfig._retry) {
+        console.log("refreshing")
         originalConfig._retry = true;
         try {
           const currentRefreshToken = Cookies.get("refreshToken");
@@ -52,7 +53,6 @@ server.interceptors.response.use(
             const date = new Date();
             let accessTokenExpireDate=  new Date(date.getTime() +(60*1000));
             Cookies.set("accessToken", accessToken, {expires: accessTokenExpireDate})
-            store.dispatch(setUser({accessToken}));
             return server(originalConfig);
           }
         } catch (_error) {

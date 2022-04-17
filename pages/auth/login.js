@@ -9,10 +9,12 @@ import { useRouter } from 'next/router';
 import store from '../../app/store';
 import { setUser } from './authSlice';
 import Cookies from 'js-cookie'
+import { useGetUserMutation } from '../user/userAPI';
 
 const Login = ()=>{
     const router = useRouter()
     const [login] = useLoginUserMutation()
+    const [getUser]  = useGetUserMutation()
     const notify = (type, message) => {
         toast({ type, message });
     }
@@ -21,19 +23,18 @@ const Login = ()=>{
     const handleLogin = async(values,actions)=>{
         try{
             const userInfo = await login(values).unwrap()
-            console.log(userInfo)
-            store.dispatch(setUser({userId: userInfo?.user?._id, email :userInfo?.user?.email, isLoggedIn : true}))
             let date = new Date();
             let accessTokenExpireDate=  new Date(date.getTime() +(60*1000));
             let refreshTokenExpireDate=  new Date(date.getTime() +(86400*1000));
             Cookies.set("accessToken",userInfo?.tokens?.accessToken, {expires: accessTokenExpireDate})
             Cookies.set("refreshToken",userInfo?.tokens?.refreshToken,{expires: refreshTokenExpireDate})
+            store.dispatch(setUser({isLoggedIn:true, userId: userInfo?.user?._id, email: userInfo?.user?.email }))
             notify("success","Logged In");
-            router.push("/app")
+            router.push("/")
         }
         catch(err){
             console.log(err?.data?.message)
-            setLoginError("Invalid email or password.")
+            setLoginError(err?.data?.message)
             notify("error", "Invalid Credentials !")
         }
         actions.setSubmitting(false);

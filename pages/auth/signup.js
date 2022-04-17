@@ -10,10 +10,12 @@ import Cookies from 'js-cookie'
 
 import store from '../../app/store';
 import { setUser } from './authSlice';
+import { useGetUserMutation } from '../user/userAPI';
 
 const SignUp = ()=>{
     const router = useRouter()
     const [register, isLoading] = useRegisterUserMutation()
+    const [getUser]  = useGetUserMutation()
     const notify = (type, message) => {
         toast({ type, message });
     }
@@ -23,14 +25,14 @@ const SignUp = ()=>{
         setSignUpError("")
         try{
             const userInfo = await register(values).unwrap()
-            store.dispatch(setUser({userId: userInfo?.user?._id, email :userInfo?.user?.email, isLoggedIn : true}))
             const date = new Date();
             let accessTokenExpireDate=  new Date(date.getTime() +(60*1000));
             let refreshTokenExpireDate=  new Date(date.getTime() +(86400*1000));
             Cookies.set("accessToken",userInfo?.tokens?.accessToken, {expires: accessTokenExpireDate})
             Cookies.set("refreshToken",userInfo?.tokens?.refreshToken,{expires: refreshTokenExpireDate})
+            store.dispatch(setUser({isLoggedIn:true, userId: userInfo?.user?._id, email: userInfo?.user?.email }))
             notify("success","Welcome");
-            router.push("/app")
+            router.push("/")
         }
         catch(err){
             console.log(err?.data?.message)
